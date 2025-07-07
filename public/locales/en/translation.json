@@ -1,0 +1,52 @@
+ {
+    "dashboard": {
+      "welcome": "Welcome back, {{name}}",
+      "generateReport": "Generate Report",
+      "switchToTeacher": "Switch to Teacher View",
+      "totalStudents": "Total Students",
+      "activeTeachers": "Active Teachers",
+      "attendanceRate": "Attendance Rate",
+      "pendingAssignments": "Pending Assignments",
+      "administrativeTools": "Administrative Tools",
+      "userManagement": "User Management",
+      "reports": "Reports",
+      "systemSettings": "System Settings",
+      "helpSupport": "Help & Support"
+    },
+    "activityFeed": {
+      "title": "Recent Activity",
+      "viewAll": "View All Activity"
+    },
+    "attendanceAlerts": {
+      "title": "Attendance Alerts",
+      "viewDetails": "View Details",
+      "dismiss": "Dismiss",
+      "viewAll": "View All Alerts"
+    },
+    "eventsCalendar": {
+      "title": "Upcoming Events",
+      "viewCalendar": "View Full Calendar",
+      "addEvent": "Add Event",
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "performanceChart": {
+      "title": "Analytics Dashboard",
+      "enrollmentTrends": "Enrollment Trends",
+      "attendancePatterns": "Attendance Patterns",
+      "academicPerformance": "Academic Performance",
+      "dataUpdated": "Data updated {{time}} ago",
+      "export": "Export",
+      "refresh": "Refresh"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "viewAll": "View All Actions"
+    },
+    "systemStatus": {
+      "title": "System Status",
+      "allSystemsOperational": "All Systems Operational",
+      "lastUpdated": "Last updated:"
+    }
+  
+}

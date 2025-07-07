@@ -1,0 +1,52 @@
+{
+    "dashboard": {
+      "welcome": "वापसी पर स्वागत है, {{name}}",
+      "generateReport": "रिपोर्ट बनाएं",
+      "switchToTeacher": "शिक्षक व्यू पर स्विच करें",
+      "totalStudents": "कुल छात्र",
+      "activeTeachers": "सक्रिय शिक्षक",
+      "attendanceRate": "उपस्थिति दर",
+      "pendingAssignments": "लंबित असाइनमेंट",
+      "administrativeTools": "प्रशासनिक उपकरण",
+      "userManagement": "उपयोगकर्ता प्रबंधन",
+      "reports": "रिपोर्ट",
+      "systemSettings": "सिस्टम सेटिंग्स",
+      "helpSupport": "सहायता और समर्थन"
+    },
+    "activityFeed": {
+      "title": "हाल की गतिविधि",
+      "viewAll": "सभी गतिविधि देखें"
+    },
+    "attendanceAlerts": {
+      "title": "उपस्थिति अलर्ट",
+      "viewDetails": "विवरण देखें",
+      "dismiss": "खारिज करें",
+      "viewAll": "सभी अलर्ट देखें"
+    },
+    "eventsCalendar": {
+      "title": "आगामी कार्यक्रम",
+      "viewCalendar": "पूरा कैलेंडर देखें",
+      "addEvent": "कार्यक्रम जोड़ें",
+      "today": "आज",
+      "tomorrow": "कल"
+    },
+    "performanceChart": {
+      "title": "विश्लेषिकी डैशबोर्ड",
+      "enrollmentTrends": "नामांकन रुझान",
+      "attendancePatterns": "उपस्थिति पैटर्न",
+      "academicPerformance": "शैक्षणिक प्रदर्शन",
+      "dataUpdated": "डेटा {{time}} पहले अपडेट किया गया",
+      "export": "निर्यात करें",
+      "refresh": "रीफ्रेश करें"
+    },
+    "quickActions": {
+      "title": "त्वरित कार्रवाइयां",
+      "viewAll": "सभी कार्रवाइयां देखें"
+    },
+    "systemStatus": {
+      "title": "सिस्टम स्थिति",
+      "allSystemsOperational": "सभी सिस्टम चालू हैं",
+      "lastUpdated": "अंतिम अपडेट:"
+    }
+  }
+

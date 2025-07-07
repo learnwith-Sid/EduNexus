@@ -1,10 +1,15 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App";
-import "./styles/tailwind.css";
-import "./styles/index.css";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import './styles/tailwind.css'; // Or your main CSS file
 
-const container = document.getElementById("root");
-const root = createRoot(container);
-
-root.render(<App />);
+// The BrowserRouter should wrap your App component here.
+// This makes the router context available to the entire application.
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);
