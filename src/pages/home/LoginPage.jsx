@@ -1,63 +1,48 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios for making API requests
+import { useNavigate, Link } from 'react-router-dom';
+import { login } from '../../services/authService'; // Import the new login service
 import ThreeJSBackground from './components/ThreeJSBackground'; // Assuming path
-import { UserIcon, LockIcon } from './components/Icons'; // Assuming path
-
-// New icon for the School ID field
-const SchoolIcon = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 2L3 8V20H21V8L12 2ZM11 18H7V14H11V18ZM17 18H13V14H17V18ZM17 12H7V9L12 6.5L17 9V12Z" />
-    </svg>
-);
+import { UserIcon, LockIcon, SchoolIcon } from './components/Icons'; // Assuming path
 
 const LoginPage = ({ onLogin }) => {
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // ** UPDATED: Using the specific API URL you provided **
-    const API_URL = 'http://localhost:5029/api/auth/login';
-
-
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
-        const usernameOrEmail = e.target.usernameOrEmail.value;
-        const password = e.target.password.value;
-        const schoolCode = e.target.schoolCode.value;
+        const credentials = {
+            username: e.target.usernameOrEmail.value,
+            email: e.target.usernameOrEmail.value,
+            password: e.target.password.value,
+            schoolCode: e.target.schoolCode.value,
+        };
 
         try {
-            // ** UPDATED: Sending `schoolCode` to match backend model **
-            const response = await axios.post(API_URL, {
-                username: usernameOrEmail,
-                email: usernameOrEmail,
-                password,
-                schoolCode: schoolCode,
-            });
+            // Use the new login service
+            const data = await login(credentials);
 
-            const { data } = response;
-
+            // Store user data in localStorage
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", data.username);
             localStorage.setItem("role", data.roles[0]);
             localStorage.setItem("schoolCode", data.schoolCode);
             
+            // Update global app state
             onLogin(); 
 
+            // Navigate to the dashboard
             navigate('/admin-dashboard');
 
         } catch (err) {
-            if (err.response && err.response.status === 404) {
-                setError('Login endpoint not found. Please check the API URL.');
-            } else if (err.response && err.response.status === 401) {
+            if (err.response && (err.response.status === 401 || err.response.status === 404)) {
                 setError('Invalid credentials. Please try again.');
             } else {
                 setError('An error occurred. Please check the console and ensure the backend is running.');
             }
-            console.error("Login failed:", err);
         } finally {
             setIsLoading(false);
         }
@@ -106,7 +91,11 @@ const LoginPage = ({ onLogin }) => {
                         </button>
                     </div>
                 </form>
-                <p className="text-center text-xs text-gray-500 mt-8">© 2025 School Management Inc. All rights reserved.</p>
+                <div className="text-center mt-6">
+                    <Link to="/" className="text-sm text-blue-300 hover:text-blue-200 hover:underline transition-colors">
+                        &larr; Back to Home
+                    </Link>
+                </div>
             </div>
         </div>
     );

@@ -11,43 +11,58 @@ function AppContent() {
   const [connection, setConnection] = useState(null);
   const isThreeJsLoaded = useScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
 
+  // This useEffect now only handles the SignalR connection.
+  // It no longer fetches historical data, fixing the notification issue.
   useEffect(() => {
-    if (isLoggedIn && !connection) {
-      const role = localStorage.getItem('role') || 'N/A';
-      const newConnection = new HubConnectionBuilder()
-        .withUrl(`http://localhost:5029/chatHub?role=${role}`)
-        .withAutomaticReconnect()
-        .build();
-
-      setConnection(newConnection);
-    }
-  }, [isLoggedIn, connection]);
-
-  useEffect(() => {
-    if (connection) {
-      connection.start()
-        .then(() => {
-          console.log('Connected to SignalR Hub');
-          connection.on('ReceiveNotification', (message, targetRole) => {
-            console.log('🔔 Received Notification:', message, "Target:", targetRole);
-            const userRole = localStorage.getItem('role');
-            if (targetRole === "All" || targetRole === userRole) {
-              setNotifications(prev => [message, ...prev]);
-            }
-          });
-        })
-        .catch(e => console.error('SignalR Connection Error: ', e));
-      
-      return () => {
+    // Only establish a connection if the user is logged in.
+    if (!isLoggedIn) {
+      if (connection) {
         connection.stop();
-      };
+        setConnection(null);
+      }
+      return;
     }
-  }, [connection]);
+
+    const role = localStorage.getItem('role') || 'N/A';
+    const newConnection = new HubConnectionBuilder()
+      .withUrl(`http://localhost:5029/chatHub?role=${role}`)
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(newConnection);
+
+    newConnection.start()
+      .then(() => {
+        console.log('Connected to SignalR Hub');
+        newConnection.on('ReceiveNotification', (title, message, targetRole) => {
+          console.log('🔔 Received Notification:', { title, message, targetRole });
+          
+          const userRole = localStorage.getItem('role');
+          if (targetRole === "All" || targetRole === userRole) {
+            const newNotification = {
+              id: new Date().getTime(),
+              title: title,
+              message: message,
+              targetRole: targetRole
+            };
+            setNotifications(prev => [newNotification, ...prev]);
+          }
+        });
+      })
+      .catch(e => console.error('SignalR Connection Error: ', e));
+
+    // Cleanup function to stop the connection on component unmount or logout
+    return () => {
+      newConnection.stop();
+    };
+  }, [isLoggedIn]); // This effect correctly re-runs on login/logout
 
   const handleLogin = () => setIsLoggedIn(true);
 
   const handleLogout = () => {
-    if (connection) connection.stop();
+    if (connection) {
+      connection.stop();
+    }
     localStorage.clear();
     setIsLoggedIn(false);
     navigate('/login');

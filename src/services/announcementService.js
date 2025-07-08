@@ -21,6 +21,15 @@ export const getAnnouncements = async () => {
         return [];
     }
 };
+export const getAnnouncementsByRole = async (role) => {
+  try {
+    const response = await axios.get(`${API_URL}/by-role?role=${role}`, { headers: getAuthHeaders() });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch announcements by role:", error);
+    return [];
+  }
+};
 
 export const createAnnouncement = async (formData) => {
     try {
