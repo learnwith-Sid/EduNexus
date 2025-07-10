@@ -6,69 +6,104 @@ const ThreeJSBackground = () => {
 
     useEffect(() => {
         const mount = mountRef.current;
-        if (!mount) return;
+        if (!mount || !window.THREE) return;
 
         let renderer, scene, camera, animationFrameId;
+        const mouse = new THREE.Vector2();
 
         // Scene setup
         scene = new THREE.Scene();
-        camera = new THREE.OrthographicCamera(mount.clientWidth / -2, mount.clientWidth / 2, mount.clientHeight / 2, mount.clientHeight / -2, 1, 1000);
-        camera.position.z = 1;
+        camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
+        camera.position.z = 6;
 
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(mount.clientWidth, mount.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         mount.appendChild(renderer.domElement);
-        
-        // --- Create Floating Circles ---
-        const circles = [];
-        const circleCount = 20;
-        const colors = [0x0077be, 0x00a8e8, 0xffffff, 0x90e0ef]; // Shades of blue and white
 
-        for (let i = 0; i < circleCount; i++) {
-            const radius = Math.random() * 50 + 20;
-            const geometry = new THREE.CircleGeometry(radius, 32);
-            const material = new THREE.MeshBasicMaterial({
-                color: colors[Math.floor(Math.random() * colors.length)],
-                transparent: true,
-                opacity: Math.random() * 0.3 + 0.1
-            });
+        // --- Texture Loading ---
+        const textureLoader = new THREE.TextureLoader();
+        let envMapTexture;
+        textureLoader.load(
+            '../../assets/images/colormap-6.png',
+            (texture) => {
+                texture.mapping = THREE.EquirectangularReflectionMapping;
+                scene.background = texture;
+                scene.environment = texture;
+                envMapTexture = texture; // Store for potential later use
+            }
+        );
 
-            const circle = new THREE.Mesh(geometry, material);
+        let colormapTexture;
+        textureLoader.load(
+            '../../assets/images/colormap-6.png',
+            (texture) => {
+                colormapTexture = texture;
+                // Apply the colormap as a texture to the Sphere
+                // sphere.material.map = colormapTexture;
+                // sphere.material.needsUpdate = true; // Important: Tell the material to update
+            }
+        );
 
-            // Position circles within the viewport
-            circle.position.x = (Math.random() - 0.5) * mount.clientWidth;
-            circle.position.y = (Math.random() - 0.5) * mount.clientHeight;
-            circle.position.z = (Math.random() - 0.5) * 500;
+        // --- 3D Objects ---
+        const objects = [];
+        const reflectiveMaterial = new THREE.MeshStandardMaterial({
+            metalness: 1.0,
+            roughness: 0.0,
+            envMap: envMapTexture // Use the loaded environment map
+        });
+        const texturedMaterial = new THREE.MeshStandardMaterial({ // Material for the textured object
+            metalness: 0.5, // Adjust for desired appearance
+            roughness: 0.5,
+        });
 
-            // Add custom properties for animation
-            circle.userData.velocity = new THREE.Vector3(
-                (Math.random() - 0.5) * 0.5,
-                (Math.random() - 0.5) * 0.5,
-                0
-            );
-            circle.userData.initialOpacity = material.opacity;
-            
-            scene.add(circle);
-            circles.push(circle);
-        }
+        // 1. Sphere (Replaced Torus Knot)
+        // const sphereGeometry = new THREE.SphereGeometry(1.5, 32, 32); // Radius, widthSegments, heightSegments
+        // const sphere = new THREE.Mesh(sphereGeometry, texturedMaterial); // Use the textured material initially
+        // sphere.position.set(-3.5, 0, 0);
+        // scene.add(sphere);
+        // objects.push(sphere);
+
+        // // 2. Icosahedron (faceted sphere)
+        // const icosahedronGeometry = new THREE.IcosahedronGeometry(1.5, 0);
+        // const icosahedron = new THREE.Mesh(icosahedronGeometry, reflectiveMaterial);
+        // icosahedron.position.set(3.5, 0, 0);
+        // scene.add(icosahedron);
+        // objects.push(icosahedron);
+
+        // 3. Torus
+        // const torusGeometry = new THREE.TorusGeometry(1, 0.3, 16, 100);
+        // const torus = new THREE.Mesh(torusGeometry, reflectiveMaterial);
+        // torus.position.set(0, 0, -3);
+        // scene.add(torus);
+        // objects.push(torus);
+
+        // Mouse move listener for parallax effect
+        const onMouseMove = (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        };
+        window.addEventListener('mousemove', onMouseMove);
 
         // Animation loop
+        const clock = new THREE.Clock();
         const animate = () => {
-            circles.forEach(circle => {
-                circle.position.add(circle.userData.velocity);
+            const elapsedTime = clock.getElapsedTime();
 
-                // Bounce off edges
-                if (circle.position.x > mount.clientWidth / 2 || circle.position.x < -mount.clientWidth / 2) {
-                    circle.userData.velocity.x *= -1;
-                }
-                if (circle.position.y > mount.clientHeight / 2 || circle.position.y < -mount.clientHeight / 2) {
-                    circle.userData.velocity.y *= -1;
-                }
-                
-                // Fade in and out
-                circle.material.opacity = circle.userData.initialOpacity * (Math.sin(Date.now() * 0.001 + circle.position.x) * 0.5 + 0.5);
-            });
+            // Animate objects
+            // sphere.rotation.y = elapsedTime * 0.1;
+            // sphere.rotation.x = -elapsedTime * 0.05;
+
+            // icosahedron.rotation.y = -elapsedTime * 0.15;
+            // icosahedron.rotation.x = elapsedTime * 0.1;
+
+            // torus.rotation.y = elapsedTime * 0.08;
+            // torus.rotation.z = elapsedTime * 0.1;
+
+            // Parallax effect for camera
+            camera.position.x += (mouse.x * 2 - camera.position.x) * 0.02;
+            camera.position.y += (mouse.y * 2 - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
 
             renderer.render(scene, camera);
             animationFrameId = requestAnimationFrame(animate);
@@ -80,36 +115,35 @@ const ThreeJSBackground = () => {
             if (!renderer || !camera || !mount) return;
             const width = mount.clientWidth;
             const height = mount.clientHeight;
-            
+
             renderer.setSize(width, height);
-            camera.left = width / -2;
-            camera.right = width / 2;
-            camera.top = height / 2;
-            camera.bottom = height / -2;
+            camera.aspect = width / height;
             camera.updateProjectionMatrix();
         };
         window.addEventListener('resize', handleResize);
 
         // Cleanup
         return () => {
+            window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(animationFrameId);
             if (mount && renderer && renderer.domElement) {
                 mount.removeChild(renderer.domElement);
             }
-            circles.forEach(circle => {
-                circle.geometry.dispose();
-                circle.material.dispose();
+            objects.forEach(obj => {
+                obj.geometry.dispose();
+                obj.material.dispose();
             });
             renderer.dispose();
+            if (envMapTexture) envMapTexture.dispose();
+            if (colormapTexture) colormapTexture.dispose();
         };
     }, []);
 
     return (
-        <div 
-            ref={mountRef} 
-            className="fixed top-0 left-0 -z-10 w-full h-full bg-gray-900" 
-            style={{ backgroundColor: '#020617' }} // Dark navy blue
+        <div
+            ref={mountRef}
+            className="absolute top-0 left-0 w-full h-full"
         />
     );
 };
